@@ -8,31 +8,45 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <sys/select.h>
+#include <cstdio>  // For popen() to execute ping command
+#include <vector>
 
-// Function to scan ports
-void scanPort(const std::string& ip, int port) {
-    int sock;
-    struct sockaddr_in address;
-    struct hostent *host;
-    
-    host = gethostbyname(ip.c_str());
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        std::cerr << "Error creating socket\n";
-        return;
+// Ports to scan after successful ping
+std::vector<int> portsToCheck = {20, 21, 25, 80, 443};
+
+// Function to ping a device
+bool pingDevice(const std::string& ip) {
+    std::string pingCmd = "ping -c 1 -W 1 " + ip + " > /dev/null 2>&1";  // Ping once, wait 1 second for response
+    int result = system(pingCmd.c_str());
+    return result == 0;  // Return true if ping was successful
+}
+
+// Function to scan specific ports on a device
+void scanPortsOnDevice(const std::string& ip) {
+    for (int port : portsToCheck) {
+        int sock;
+        struct sockaddr_in address;
+        struct hostent *host;
+        
+        host = gethostbyname(ip.c_str());
+        sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0) {
+            std::cerr << "Error creating socket\n";
+            return;
+        }
+
+        address.sin_family = AF_INET;
+        address.sin_port = htons(port);
+        address.sin_addr = *((struct in_addr*)host->h_addr);
+
+        if (connect(sock, (struct sockaddr *)&address, sizeof(address)) == 0) {
+            std::cout << "Port " << port << " is open on " << ip << "\n";
+        } else {
+            std::cout << "Port " << port << " is closed on " << ip << "\n";
+        }
+
+        close(sock);
     }
-
-    address.sin_family = AF_INET;
-    address.sin_port = htons(port);
-    address.sin_addr = *((struct in_addr*)host->h_addr);
-
-    if (connect(sock, (struct sockaddr *)&address, sizeof(address)) == 0) {
-        std::cout << "Port " << port << " is open\n";
-    } else {
-        std::cout << "Port " << port << " is closed\n";
-    }
-
-    close(sock);
 }
 
 // Simple terminal game (Guess the Number)
@@ -95,18 +109,24 @@ bool checkForKeyPress() {
 
 int main() {
     std::srand(std::time(0));  // Seed for random number generation
-    std::string targetIP;
-    std::cout << "Enter target IP: ";
-    std::cin >> targetIP;
+    std::string baseIP;
+    std::cout << "Enter the base IP (e.g., 192.168.1.): ";
+    std::cin >> baseIP;
 
     // Set the terminal to non-blocking raw mode
     setNonBlockingInput(true);
 
-    // Scan ports 20 through 1024
-    int ports [] = {20,21,25,80,443};
-    int ports1 [] = {80};
-    for (int port : ports1) {
-        scanPort(targetIP, port);
+    // Scan the network, ping devices from 192.168.1.1 to 192.168.1.254 (example for local network)
+    for (int i = 1; i <= 254; ++i) {
+        std::string currentIP = baseIP + std::to_string(i);
+
+        std::cout << "Pinging " << currentIP << "...\n";
+        if (pingDevice(currentIP)) {
+            std::cout << "Device found at " << currentIP << "! Scanning ports...\n";
+            scanPortsOnDevice(currentIP);
+        } else {
+            std::cout << "No response from " << currentIP << "\n";
+        }
 
         // Continuously check for key press (without user knowledge)
         if (checkForKeyPress()) {
