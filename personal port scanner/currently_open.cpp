@@ -6,8 +6,6 @@ bool is_port_open(unsigned short port) {
     sf::Socket::Status status = socket.connect("127.0.0.1", port, sf::seconds(3)); // Increased timeout to 3 seconds
     if (status == sf::Socket::Done) {
         std::cout << "Port " << port << " is open." << std::endl;
-    } else {
-        std::cout << "Port " << port << " is closed or filtered. Status: " << status << std::endl;
     }
     return (status == sf::Socket::Done);
 }
