@@ -1,8 +1,22 @@
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unisted.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <cstdlib>
+
 #include <thread>
-#include <vector>
 #include <mutex>
+#include <vector>
 #include <algorithm>
+#include <string>
+
+using std::thread;
+using std::mutex;
+using std::lock_guard;
+using std::vector;
+using std::string;
 
 extern std::ostream cerr;
 
@@ -10,15 +24,58 @@ extern std::ostream cerr;
 std::mutex m;
 std::vector<int> open_ports_masterlist;
 
-// port_scanner(string IP, int start_port, int end_port)
-
-std::vector<int> port_scanner(std::string IP, int start_port, int end_port){
-    return {};
-    // TODO john fill in 
+bool deviceping(const string &ip) {
+    string pingcommand = "ping -c 1 -W 1" + ip + " > /dev/null/ 2>&1";
+    int response = system(pingcommand.c_str());
+    if (response == 0) {
+        std::cout << "Device " << ip << " detected" << std::endl;
+        return true;
+    }
+    else {
+        std::cout << "No detection of device " << ip << std::endl;
+        return false;
+    }
 }
 
-void update_open_list(std::string IP, int start_port, int end_port){
-    std::vector<int> thread_open_list = port_scanner(IP, start_port, end_port);
+
+// port_scanner(string IP, int start_port, int end_port)
+vector<int> port_scanner(const string &ip, int start_port, int end_port, bool isdevice){
+    if (isdevice == false) {
+        return vector<int>();
+    }
+    int sockfd;
+    struct sockaddr_in scanner;
+
+    if (inet_pton(AF_INET, ip, &scanner.sin_addr) < 1) {
+        fprintf(stderr, "ERROR: problem loading ip address");
+        exit(1);
+    }
+
+    memset(&scanner, 0, sizeof(scanner));
+    scanner.sin_family = AF_INET;
+    scanner.sin_addr.s_addr = inet_addr(ip);
+
+    for (int i = start; i < end; ++i) {
+        scanner.sin_port = htons(i);
+
+        if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+            fprinf(stderr, "ERROR: failed to create socket for port %d.\n Trying again.", i);
+            close(sockfd);
+            i--;
+            continue;
+        }
+        if (connect(sockfd, (struct sockaddr*) &scanner, sizeof(scanner) == 0)) {
+            open_ports_masterlist.push_back(i)
+        }
+        close(sockfd);
+    }
+
+    return open_ports_masterlist;
+}
+
+void update_open_list(const string &ip, int start_port, int end_port){
+    bool isdevice= deviceping(ip);
+    std::vector<int> thread_open_list = port_scanner(ip, start_port, end_port, isdevice);
     // acquire mutex
     m.lock();
     open_ports_masterlist.insert(open_ports_masterlist.end(), thread_open_list.begin(), thread_open_list.end());
@@ -26,13 +83,20 @@ void update_open_list(std::string IP, int start_port, int end_port){
     // you can uncomment these for debugging if needed
     // std::cout << "start port: " << start_port << std::endl;
     // std::cout << "end port: " << end_port << std::endl;
+    if (isdevice == true) {
+        for (int i = open_ports_masterlist.begin(); i != open_ports_masterlist.end(); ++i) {
+            std::cout << "open port: " << *i << std::endl;
+        }
+    }
+    else {
+        std::cout << "No port scan for " << ip << " due to it not being detected on local network" << std::endl;
+    }
     m.unlock();
 
     return; 
 }
 
-
-void scan_ports_ip(std::string IP){
+void scan_ports_ip(const string &ip){
 
     std::vector<std::thread> thread_vec;
 
