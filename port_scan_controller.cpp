@@ -22,8 +22,10 @@ void update_open_list(std::string IP, int start_port, int end_port){
     // acquire mutex
     m.lock();
     open_ports_masterlist.insert(open_ports_masterlist.end(), thread_open_list.begin(), thread_open_list.end());
-    std::cout << "start port: " << start_port << std::endl;
-    std::cout << "end port: " << end_port << std::endl;
+
+    // you can uncomment these for debugging if needed
+    // std::cout << "start port: " << start_port << std::endl;
+    // std::cout << "end port: " << end_port << std::endl;
     m.unlock();
 
     return; 
@@ -49,13 +51,14 @@ void scan_ports_ip(std::string IP){
     int start_port = 0;
     int end_port;
     for(int i = 0; i < max_threads; i++){
-        if(i == max_threads){
+        if(i == (max_threads - 1)){
             // assign only remainder_ports
             end_port = start_port + remainder_ports;
+        }else{
+            end_port = start_port + (ports_per_thread - 1);
         }
-        end_port = start_port + ports_per_thread;
-        start_port = end_port + 1;
         thread_vec.push_back(std::thread(update_open_list, IP, start_port, end_port));
+        start_port = end_port + 1;
     }
 
     for (std::thread &t : thread_vec){
