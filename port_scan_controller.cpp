@@ -28,11 +28,9 @@ bool deviceping(const string &ip) {
     string pingcommand = "ping -c 1 -W 1" + ip + " > /dev/null/ 2>&1";
     int response = system(pingcommand.c_str());
     if (response == 0) {
-        std::cout << "Device " << ip << " detected" << std::endl;
         return true;
     }
     else {
-        std::cout << "No detection of device " << ip << std::endl;
         return false;
     }
 }
@@ -74,23 +72,24 @@ vector<int> port_scanner(const string &ip, int start_port, int end_port, bool is
 }
 
 void update_open_list(const string &ip, int start_port, int end_port){
-    bool isdevice= deviceping(ip);
+    bool isdevice = deviceping(ip);
     std::vector<int> thread_open_list = port_scanner(ip, start_port, end_port, isdevice);
     // acquire mutex
     m.lock();
     open_ports_masterlist.insert(open_ports_masterlist.end(), thread_open_list.begin(), thread_open_list.end());
 
-    // you can uncomment these for debugging if needed
-    // std::cout << "start port: " << start_port << std::endl;
-    // std::cout << "end port: " << end_port << std::endl;
     if (isdevice == true) {
+        std::cout << "Device found: " << ip << std::endl;
+        std::cout << "open ports: " << std::endl;
         for (int i = open_ports_masterlist.begin(); i != open_ports_masterlist.end(); ++i) {
-            std::cout << "open port: " << *i << std::endl;
+            std::cout << *i << std::endl;
         }
+        std::cout << "\n\n\n" << std::endl;
     }
     else {
         std::cout << "No port scan for " << ip << " due to it not being detected on local network" << std::endl;
     }
+    
     m.unlock();
 
     return; 
