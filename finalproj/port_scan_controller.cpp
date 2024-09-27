@@ -19,11 +19,21 @@ using std::lock_guard;
 using std::vector;
 using std::string;
 
-extern std::ostream cerr;
+using std::cerr;
 
 // globals
 std::mutex open_ports_mutex;
 std::vector<int> open_ports;
+
+void help() {
+    std::cout << "Usage:\n"
+         << "-s : Scan well-known ports (0-1023)\n"
+         << "-u : Scan registered ports (1024-49151)\n"
+         << "-p : Scan dynamic/private ports (49152-65535)\n"
+         << "-a : Scan all ports (0-65535)\n"
+         << "-i <ip_base> : Set base IP address (e.g., 192.168.1)\n"
+         << "-h : Show help\n";
+}
 
 bool deviceping(const string &ip) {
     string pingcommand = "ping -c 1 -W 3 " + ip + " > /dev/null";
@@ -49,7 +59,7 @@ void scan_ports_range(unsigned short s_port, unsigned short e_port, const char* 
     }
 }
 
-void scan_ports(const string &ip){
+void scan_ports(const string &ip, int start, int end){
     bool isdevice = deviceping(ip);
     if (isdevice == false) {
         std::cout << "No device detected at " << ip << std::endl;
@@ -61,10 +71,10 @@ void scan_ports(const string &ip){
         num_threads = 1;
     }
     
-    const unsigned short s_port = 1;
+    const unsigned short s_port = start;
     //there are a total of 65535 ports
     //we will just check the first 20000 ports
-    const unsigned short e_port = 20000;
+    const unsigned short e_port = end;
     unsigned short ports_per_thread = (e_port - s_port + 1) / num_threads;
 
     std::vector<std::thread> threads;
@@ -86,15 +96,64 @@ void scan_ports(const string &ip){
 }
 
 
-int main(){
+int main(int argc, char* argv[]) {
     string ip_base;
-    std::cout << "Please enter the first three octets of your router's IP address (e.g., 192.168.1): ";
-    std::cin >> ip_base;
+    int c;
+    int start = 0;
+    int end = 65535;
+
+    if (argc == 1) {
+        help();
+        return 1;
+    }
+
+    // Parse command-line options
+    while ((c = getopt(argc, argv, "supai:h")) != -1) {
+        switch (c) {
+            case 's':
+                start = 0;
+                end = 1023;
+                break;
+            case 'u':
+                start = 1024;
+                end = 49151;
+                break;
+            case 'p':
+                start = 49152;
+                end = 65535;
+                break;
+            case 'a':
+                start = 0;
+                end = 65535;
+                break;
+            case 'i':
+                if (optarg) {
+                    ip_base = optarg;  // Capture the IP base entered by the user
+                } else {
+                    cerr << "ERROR: No IP base provided with -i option\n";
+                    return 1;
+                }
+                break;
+            case 'h':
+                help();
+                return 0;
+            default:
+                help();
+                return 1;
+        }
+    }
+
+    // Check if ip_base is set, if not show help
+    if (ip_base.empty()) {
+        cerr << "ERROR: IP base is required. Use the -i option to provide an IP base.\n";
+        return 1;
+    }
 
     // Start scanning IPs from ip_base.1 to ip_base.254
     for (int i = 1; i <= 254; ++i) {
         string ip = ip_base + "." + std::to_string(i);
-        scan_ports(ip);
+        scan_ports(ip, start, end);
     }
+
     return 0;
 }

@@ -16,7 +16,7 @@ SFML_INCLUDE_PATH := /usr/local/include   # Adjust if necessary
 LIBS := -lsfml-network -lsfml-system
 
 # Target executable name
-TARGET := port_scanner
+TARGET := network_port_scanner
 
 # Source files
 SRCS := port_scan_controller.cpp
