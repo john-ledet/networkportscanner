@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <SFML/Network.hpp>
 
 using std::thread;
 using std::mutex;
@@ -21,111 +22,70 @@ using std::string;
 extern std::ostream cerr;
 
 // globals
-std::mutex m;
-std::vector<int> open_ports_masterlist;
+std::mutex open_ports_mutex;
+std::vector<int> open_ports;
 
 bool deviceping(const string &ip) {
-    string pingcommand = "ping -c 1 -W 1 " + ip + " > /dev/null 2>&1";
+    string pingcommand = "ping -c 1 -W 3 " + ip + " > /dev/null";
     int response = system(pingcommand.c_str());
     if (response == 0) {
         return true;
     }
     else {
-        std::cout << "No device detected at: " << std::endl;
         return false;
     }
 }
 
 
-// port_scanner(string IP, int start_port, int end_port)
-vector<int> port_scanner(const char* ip, int start_port, int end_port, bool isdevice){
-    if (isdevice == false) {
-        return vector<int>();
-    }
-    int sockfd;
-    struct sockaddr_in scanner;
 
-    if (inet_pton(AF_INET, ip, &scanner.sin_addr) < 1) {
-        fprintf(stderr, "ERROR: problem loading ip address");
-        exit(1);
-    }
-
-    memset(&scanner, 0, sizeof(scanner));
-    scanner.sin_family = AF_INET;
-    scanner.sin_addr.s_addr = inet_addr(ip);
-
-    for (int i = start_port; i < end_port; ++i) {
-        scanner.sin_port = htons(i);
-
-        if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-            fprintf(stderr, "ERROR: failed to create socket for port %d.\n Trying again.", i);
-            close(sockfd);
-            i--;
-            continue;
+void scan_ports_range(unsigned short s_port, unsigned short e_port, const char* ip){
+    for(unsigned short port = s_port; port <= e_port; port++){
+        sf::TcpSocket socket;
+        sf::Socket::Status status = socket.connect(ip, port, sf::seconds(2));
+        if(status == sf::Socket::Done){
+            std::lock_guard<std::mutex> lock(open_ports_mutex);
+            std::cout << "Adding port " << port << " to list of open ports" << std::endl;
+            open_ports.push_back(port);
         }
-        if (connect(sockfd, (struct sockaddr*) &scanner, sizeof(scanner)) == 0) {
-            open_ports_masterlist.push_back(i);
-        }
-        close(sockfd);
     }
-
-    return open_ports_masterlist;
 }
 
-void update_open_list(const char* ip, int start_port, int end_port){
+void scan_ports(const string &ip){
     bool isdevice = deviceping(ip);
-    std::vector<int> thread_open_list = port_scanner(ip, start_port, end_port, isdevice);
-    // acquire mutex
-    m.lock();
-    open_ports_masterlist.insert(open_ports_masterlist.end(), thread_open_list.begin(), thread_open_list.end());
-
-    if (isdevice == true) {
-        std::cout << "Device found: " << ip << std::endl;
-        std::cout << "open ports: " << std::endl;
-        for (const int &port : open_ports_masterlist) {
-            std::cout << port << std::endl;
-        }
-        std::cout << "\n\n\n" << std::endl;
+    if (isdevice == false) {
+        std::cout << "No device detected at " << ip << std::endl;
+        return;
+    }
+    std::cout << "Device detected: " << ip << std::endl;
+    unsigned int num_threads = std::thread::hardware_concurrency();
+    if(num_threads == 0){
+        num_threads = 1;
     }
     
-    m.unlock();
+    const unsigned short s_port = 1;
+    //there are a total of 65535 ports
+    //we will just check the first 20000 ports
+    const unsigned short e_port = 20000;
+    unsigned short ports_per_thread = (e_port - s_port + 1) / num_threads;
 
-    return; 
-}
-
-void scan_ports_ip(const string &ip){
-
-    std::vector<std::thread> thread_vec;
-
-
-    int max_threads = std::thread::hardware_concurrency();
-    if (max_threads <= 0){
-        std::cerr << "No threads available on hardware";
+    std::vector<std::thread> threads;
+    for(unsigned int i = 0; i < num_threads; i++){
+        unsigned short thread_s_port = s_port + i * ports_per_thread;
+        unsigned short thread_e_port = (i == num_threads - 1) ? e_port : (thread_s_port + ports_per_thread - 1);
+        threads.emplace_back(scan_ports_range, thread_s_port, thread_e_port, ip.c_str());
     }
 
-    // let's check all 65,535 ports IDGAF
-    int ports_per_thread = 65535 / (max_threads - 1);
-    int remainder_ports = 65535 % (max_threads - 1);
-
-    // first max_threads - 1 ports will get ports_per_thread # of ports
-    // last thread will get remainder_ports number of ports
-    int start_port = 0;
-    int end_port;
-    for(int i = 0; i < max_threads; i++){
-        if(i == (max_threads - 1)){
-            // assign only remainder_ports
-            end_port = start_port + remainder_ports;
-        }else{
-            end_port = start_port + (ports_per_thread - 1);
-        }
-        thread_vec.push_back(std::thread(update_open_list, ip.c_str(), start_port, end_port));
-        start_port = end_port + 1;
+    for(auto& thread: threads){
+        thread.join();
     }
 
-    for (std::thread &t : thread_vec){
-        t.join();
+    std::sort(open_ports.begin(), open_ports.end());
+
+    for(const auto& port: open_ports){
+        std::cout << "Port " << port << " is open" << std::endl;
     }
 }
+
 
 int main(){
     string ip_base;
@@ -135,7 +95,7 @@ int main(){
     // Start scanning IPs from ip_base.1 to ip_base.254
     for (int i = 1; i <= 254; ++i) {
         string ip = ip_base + "." + std::to_string(i);
-        scan_ports_ip(ip);
+        scan_ports(ip);
     }
     return 0;
 }

@@ -12,7 +12,7 @@ std::mutex open_ports_mutex;
 void scan_ports_range(unsigned short s_port, unsigned short e_port){
     for(unsigned short port = s_port; port <= e_port; port++){
         sf::TcpSocket socket;
-        sf::Socket::Status status = socket.connect("127.0.0.1", port, sf::seconds(2));
+        sf::Socket::Status status = socket.connect("192.168.1.1", port, sf::seconds(2));
         if(status == sf::Socket::Done){
             std::lock_guard<std::mutex> lock(open_ports_mutex);
             std::cout << "Adding port " << port << " to list of open ports" << std::endl;
