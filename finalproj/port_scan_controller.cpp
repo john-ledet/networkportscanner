@@ -27,6 +27,7 @@ std::vector<int> open_ports;
 
 void help() {
     std::cout << "Usage:\n"
+         << "Note: use ipconfig (Windows) or ifconfig (Mac) to find an ip address to enter; should be separated by at least two-three octets and connected through WiFi(e.g. 0.244 or 192.168.1)\n"
          << "-s : Scan well-known ports (0-1023)\n"
          << "-u : Scan registered ports (1024-49151)\n"
          << "-p : Scan dynamic/private ports (49152-65535)\n"
@@ -146,6 +147,10 @@ int main(int argc, char* argv[]) {
     // Check if ip_base is set, if not show help
     if (ip_base.empty()) {
         cerr << "ERROR: IP base is required. Use the -i option to provide an IP base.\n";
+        return 1;
+    }
+    else if (std::count(ip_base.begin(), ip_base.end(), '.') != 1 && std::count(ip_base.begin(), ip_base.end(), '.') != 2) {
+        cerr << "ERROR: IP base is not separated in three octets; please enter a valid base.\n";
         return 1;
     }
 
