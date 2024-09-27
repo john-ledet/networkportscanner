@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <string>
 #include <SFML/Network.hpp>
+#include <csignal>
+#include <atomic>
+
 
 using std::thread;
 using std::mutex;
@@ -24,6 +27,14 @@ using std::cerr;
 // globals
 std::mutex open_ports_mutex;
 std::vector<int> open_ports;
+std::atomic<bool> keep_running(true);
+
+void signal_handler(int signal){
+    if(signal == SIGINT){
+        std::cout << "Received SIGINT, stopping port scan" << std::endl;
+        keep_running = false;
+    }
+}
 
 void networkcreation() {
     system("git clone https://github.com/Unknowinglyy/utils.git > /dev/null 2>&1");
@@ -104,6 +115,8 @@ void scan_ports(const string &ip, int start, int end){
 
 
 int main(int argc, char* argv[]) {
+    std::cout << "Press Ctrl+C to stop the scan\n" << std::endl;
+    std::signal(SIGINT, signal_handler);
     string ip_base;
     int c;
     int start = 0;
@@ -166,9 +179,12 @@ int main(int argc, char* argv[]) {
 
     // Start scanning IPs from ip_base.1 to ip_base.254
     for (int i = 1; i <= 254; ++i) {
+        if(!keep_running){
+            std::cout << "Scan interrupted by user" << std::endl;
+            return 1;
+        }
         string ip = ip_base + "." + std::to_string(i);
         scan_ports(ip, start, end);
     }
-
     return 0;
 }
