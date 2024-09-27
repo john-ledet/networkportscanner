@@ -12,7 +12,7 @@ bool is_port_open(unsigned short port) {
 
 int main() {
     unsigned short start_port = 1;
-    unsigned short end_port = 1024;
+    unsigned short end_port = 50000;
 
     std::cout << "Scanning ports from " << start_port << " to " << end_port << " on localhost..." << std::endl;
 

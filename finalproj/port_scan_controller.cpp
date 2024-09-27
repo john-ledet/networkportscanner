@@ -37,7 +37,6 @@ bool deviceping(const string &ip) {
 }
 
 
-
 void scan_ports_range(unsigned short s_port, unsigned short e_port, const char* ip){
     for(unsigned short port = s_port; port <= e_port; port++){
         sf::TcpSocket socket;
