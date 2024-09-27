@@ -37,7 +37,7 @@ bool deviceping(const string &ip) {
 
 
 // port_scanner(string IP, int start_port, int end_port)
-vector<int> port_scanner(const string &ip, int start_port, int end_port, bool isdevice){
+vector<int> port_scanner(const char* ip, int start_port, int end_port, bool isdevice){
     if (isdevice == false) {
         return vector<int>();
     }
@@ -71,7 +71,7 @@ vector<int> port_scanner(const string &ip, int start_port, int end_port, bool is
     return open_ports_masterlist;
 }
 
-void update_open_list(const string &ip, int start_port, int end_port){
+void update_open_list(const char* ip, int start_port, int end_port){
     bool isdevice = deviceping(ip);
     std::vector<int> thread_open_list = port_scanner(ip, start_port, end_port, isdevice);
     // acquire mutex
@@ -120,7 +120,7 @@ void scan_ports_ip(const string &ip){
         }else{
             end_port = start_port + (ports_per_thread - 1);
         }
-        thread_vec.push_back(std::thread(update_open_list, ip, start_port, end_port));
+        thread_vec.push_back(std::thread(update_open_list, ip.c_str(), start_port, end_port));
         start_port = end_port + 1;
     }
 
@@ -130,13 +130,14 @@ void scan_ports_ip(const string &ip){
 }
 
 int main(){
-    string ip;
-    std::cout << "Please enter a valid ip address: ";
-    std:::cin >> ip;
-    std::endl;
+    string ip_base;
+    std::cout << "Please enter the first three octets of your router's IP address (e.g., 192.168.1): ";
+    std::cin >> ip_base;
+
+    // Start scanning IPs from ip_base.1 to ip_base.254
     for (int i = 1; i <= 254; ++i) {
-        string ip1 = ip + "." + atoi(i);
-        scan_ports_ip(ip1);
+        string ip = ip_base + "." + std::to_string(i);
+        scan_ports_ip(ip);
     }
     return 0;
 }
