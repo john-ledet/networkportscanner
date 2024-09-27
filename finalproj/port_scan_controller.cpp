@@ -25,12 +25,13 @@ std::mutex m;
 std::vector<int> open_ports_masterlist;
 
 bool deviceping(const string &ip) {
-    string pingcommand = "ping -c 1 -W 1" + ip + " > /dev/null/ 2>&1";
+    string pingcommand = "ping -c 1 -W 1 " + ip + " > /dev/null 2>&1";
     int response = system(pingcommand.c_str());
     if (response == 0) {
         return true;
     }
     else {
+        std::cout << "No device detected at: " << std::endl;
         return false;
     }
 }
@@ -62,7 +63,7 @@ vector<int> port_scanner(const char* ip, int start_port, int end_port, bool isde
             i--;
             continue;
         }
-        if (connect(sockfd, (struct sockaddr*) &scanner, sizeof(scanner) == 0)) {
+        if (connect(sockfd, (struct sockaddr*) &scanner, sizeof(scanner)) == 0) {
             open_ports_masterlist.push_back(i);
         }
         close(sockfd);
@@ -85,9 +86,6 @@ void update_open_list(const char* ip, int start_port, int end_port){
             std::cout << port << std::endl;
         }
         std::cout << "\n\n\n" << std::endl;
-    }
-    else {
-        std::cout << "No port scan for " << ip << " due to it not being detected on local network" << std::endl;
     }
     
     m.unlock();
