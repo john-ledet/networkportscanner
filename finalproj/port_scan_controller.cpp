@@ -109,7 +109,7 @@ void scan_ports(const string &ip, int start, int end){
 
 
 int main(int argc, char* argv[]) {
-    std::cout << "Press Ctrl+C to stop the scan" << std::endl;
+    std::cout << "Press Ctrl+C to stop the scan\n" << std::endl;
     std::signal(SIGINT, signal_handler);
     string ip_base;
     int c;
