@@ -70,7 +70,7 @@ int main() {
 
     std::signal(SIGINT, signal_handler);
 
-    std::string network_prefix = "10.247.116";  // Change this to match your network prefix
+    std::string network_prefix = "192.168.1";  // Change this to match your network prefix
     std::cout << "Starting network scan on prefix: " << network_prefix << std::endl;
     std::vector<std::string> active_ips = scan_network(network_prefix);
 
