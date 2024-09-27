@@ -1,4 +1,4 @@
-#include "main.h"
+#include "pscan.h"
 int main()
 {
     int n_threads = thread::hardware_concurrency();
