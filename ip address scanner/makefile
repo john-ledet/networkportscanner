@@ -18,22 +18,22 @@ all: $(EXEC)
 
 # Link object files to create executable
 $(EXEC): $(OBJS)
-    $(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 # Compile source files to object files
 %.o: %.cpp
-    $(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean up
 clean:
-    rm -f $(OBJS) $(EXEC)
+	rm -f $(OBJS) $(EXEC)
 
 # Phony targets
 .PHONY: all clean
 
 # Platform-specific settings
 ifeq ($(OS),Windows_NT)
-    LIBS = -lws2_32
+	LIBS = -lws2_32
 else
-    LIBS =
+	LIBS =
 endif
