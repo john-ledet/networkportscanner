@@ -39,5 +39,8 @@ $(TARGET): $(OBJS)
 clean:
 	rm -f $(OBJS) $(TARGET)
 
+asm: $(TARGET)
+	$(CXX) $(CXXFLAGS) -I$(SFML_INCLUDE_PATH) -S $(SRCS) -o $(TARGET).s
+
 # Phony targets to prevent conflicts with files named 'clean' or 'all'
 .PHONY: all clean
