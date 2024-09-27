@@ -31,7 +31,7 @@ bool deviceping(const string &ip) {
         return true;
     }
     else {
-        std::cout << "No device detected at: " << std::endl;
+        std::cout << "No device detected at: " << ip << std::endl;
         return false;
     }
 }
