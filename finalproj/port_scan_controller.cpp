@@ -32,8 +32,8 @@ std::atomic<bool> keep_running(true);
 
 void signal_handler(int signal){
     if(signal == SIGINT){
+        keep_running.store(false);
         std::cout << "Received SIGINT, stopping port scan" << std::endl;
-        keep_running = false;
     }
 }
 
@@ -86,6 +86,10 @@ bool deviceping(const string &ip) {
 
 void scan_ports_range(unsigned short s_port, unsigned short e_port, const char* ip){
     for(unsigned short port = s_port; port <= e_port; port++){
+        //check if the user wants to stop the scan
+        if(!keep_running){
+            return;
+        }
         sf::TcpSocket socket;
         sf::Socket::Status status = socket.connect(ip, port, sf::seconds(2));
         if(status == sf::Socket::Done){
@@ -199,9 +203,8 @@ int main(int argc, char* argv[]) {
 
     // Start scanning IPs from ip_base.1 to ip_base.254
     for (int i = 1; i <= 254; ++i) {
-        if(!keep_running){
-            std::cout << "Scan interrupted by user" << std::endl;
-            return 1;
+        if(!keep_running.load()){
+            break;
         }
         string ip = ip_base + "." + std::to_string(i);
         scan_ports(ip, start, end);
