@@ -63,7 +63,7 @@ void networkcreation() {
 
 void help() {
     std::cout << "Usage:\n"
-         << "Note: use ipconfig (Windows) or ifconfig (Mac) to find an ip address to enter; should be separated by at least two-three octets and connected through WiFi(e.g. 0.244 or 192.168.1)\n"
+         << "Note: use ipconfig (Windows) or ifconfig (Mac, Linux) to find an ip address to enter; should be separated by at least two-three octets and connected through WiFi(e.g. 0.244 or 192.168.1)\n"
          << "-s : Scan well-known ports (0-1023)\n"
          << "-u : Scan registered ports (1024-49151)\n"
          << "-p : Scan dynamic/private ports (49152-65535)\n"
@@ -73,7 +73,7 @@ void help() {
 }
 
 bool deviceping(const string &ip) {
-    string pingcommand = "ping -c 1 -W 3 " + ip + " > /dev/null";
+    string pingcommand = "ping -c 1 -W 1 " + ip + " > /dev/null";
     int response = system(pingcommand.c_str());
     if (response == 0) {
         return true;
