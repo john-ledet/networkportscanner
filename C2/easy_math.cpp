@@ -27,10 +27,12 @@ void clear_terminal() {
 
 
 bool ask_question(const std::string& question, const std::string& answer) {
+    //don't want the user to see the question from before
     clear_terminal();
     std::cout << question << std::endl;
 
     std::string user_answer;
+    //reset the timeout flag for each question
     timeout = false;
     std::thread timer_thread([] (){
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -38,12 +40,14 @@ bool ask_question(const std::string& question, const std::string& answer) {
             std::raise(SIGALRM);
         }
     });
-
+    //non-blocking input, we use this instead of std::cin because we don't want the user to be able to linger on a question
     fd_set set;
     struct timeval timeout_val;
     FD_ZERO(&set);
     FD_SET(STDIN_FILENO, &set);
 
+
+    //total time the user has to answer the question is the sleep time for the timer_thread + timeout_val.tv_sec (i think...)
     timeout_val.tv_sec = 2;
     timeout_val.tv_usec = 0;
 
@@ -51,17 +55,17 @@ bool ask_question(const std::string& question, const std::string& answer) {
 
     if(result > 0){
         std::cin >> user_answer;
+        //stop the timer if the user has answered
         timeout = true;
     } else {
         timeout = true;
     }
-
+    //stop the timer as soon as possible
     if(timer_thread.joinable()){
         timer_thread.join();
     }
-
+    //user didn't answer in time
     if(timeout && user_answer.empty()) {
-        // clear_terminal();
         std::cout << "Time's up!" << std::endl;
         return false;
     }
