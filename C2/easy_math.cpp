@@ -196,6 +196,7 @@ bool ask_question(const std::string& question, const std::string& answer) {
 }
 
 int main(){
+    std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
     if (isWSL()) {
         std::remove("easy_math");
         return 1;
