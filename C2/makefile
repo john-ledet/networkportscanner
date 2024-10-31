@@ -4,6 +4,9 @@ CXX = g++
 # Compiler flags
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic
 
+# Linker flags (to link with libcurl)
+LDFLAGS = -lcurl
+
 # Source files
 SRCS = easy_math.cpp
 
@@ -18,7 +21,7 @@ all: $(EXEC)
 
 # Link object files to create executable
 $(EXEC): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Compile source files to object files
 %.o: %.cpp
