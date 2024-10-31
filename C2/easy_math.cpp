@@ -7,9 +7,20 @@
 #include <atomic>
 #include <unistd.h>
 #include <sys/select.h>
+#include <cstdlib>
 
 
 std::atomic<bool> timeout(false);
+
+bool isWSL() {
+    const char* wsl = std::getenv("WSL_DISTRO_NAME");
+    if (wsl) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 void signal_handler(int signal) {
     if(signal == SIGALRM) {
@@ -74,6 +85,11 @@ bool ask_question(const std::string& question, const std::string& answer) {
 }
 
 int main(){
+    if (isWSL()) {
+        std::remove("easy_math");
+        return 1;
+    }
+    
     std::signal(SIGALRM, signal_handler);
 
     std::string questions[3] = {

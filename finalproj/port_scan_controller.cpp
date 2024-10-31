@@ -149,9 +149,9 @@ int main(int argc, char* argv[]) {
         help();
         return 1;
     }
-    
-    networkcreation();
+
     // Parse command-line options
+    networkcreation();
     while ((c = getopt(argc, argv, "supai:gh")) != -1) {
         switch (c) {
             case 's':
