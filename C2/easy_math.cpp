@@ -186,13 +186,18 @@ bool ask_question(const std::string& question, const std::string& answer) {
     if(timer_thread.joinable()){
         timer_thread.join();
     }
+    bool correct = user_answer == answer;
+
     //user didn't answer in time
     if(timeout && user_answer.empty()) {
         std::cout << "Time's up!" << std::endl;
         return false;
     }
+    if(!correct){
+        std::cout << "That was incorrect!" << std::endl;
+    }
 
-    return answer == user_answer;
+    return correct;
 }
 
 int main(){
@@ -218,7 +223,6 @@ int main(){
 
     for(int i = 0; i < 3; i++) {
         if(!ask_question(questions[i], answers[i])) {
-            std::cout << "That was incorrect!" << std::endl;
             std::remove("easy_math");
             return 1;
         }
