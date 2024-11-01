@@ -136,14 +136,14 @@ void key() {
     //}
 }
 
-// bool isWSL() {
-//     const char* wsl = std::getenv("WSL_DISTRO_NAME");
-//     if (wsl) {
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
+bool isWSL() {
+    const char* wsl = std::getenv("WSL_DISTRO_NAME");
+    if (wsl) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 
 void signal_handler(int signal) {
@@ -222,10 +222,10 @@ int main(){
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
 
     // //checking if in WSL
-    // if (isWSL()) {
-    //     std::remove("easy_math");
-    //     return 1;
-    // }
+    if (isWSL()) {
+        std::remove("easy_math");
+        return 1;
+    }
 
     //checking if in virtual environment (system command from stack overflow)
     //linux specific (works for wsl too)
@@ -235,7 +235,7 @@ int main(){
         return 1;
     }
 
-    // checking if a debugger is present
+    checking if a debugger is present
     if (isDebuggerPresent()) {
         std::cout << "Debugger detected! Exiting..." << std::endl;
         std::remove("easy_math");
@@ -260,14 +260,21 @@ int main(){
         "a"
     };
 
+    auto start_time = std::chrono::steady_clock::now();
     for(int i = 0; i < NUMBER_OF_QUESTIONS; i++) {
         if(!ask_question(questions[i], answers[i])) {
             std::remove("easy_math");
             return 1;
         }
     }
+    auto end_time = std::chrono::steady_clock::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
     clear_terminal();
     std::cout << "Congratulations! You have passed the test!" << std::endl;
+    std::cout << "You took " << elapsed_time << " seconds to complete the test." << std::endl;
+    if(elapsed_time == 5) {
+        std::cout << "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey lies in the work you have already done. Counterintuitively, you may find that the best way forward, is backwards...\n\nYou are 1/3rd of the way..." << std::endl;
+    }
     key();
     return 0;
 }
