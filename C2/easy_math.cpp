@@ -10,7 +10,13 @@
 #include <cstdlib>
 #include <regex> 
 #include <curl/curl.h>
+#include <openssl/evp.h>
+#include <vector>
+#include <sstream>
+#include <limits>
+#include <fstream>
 
+using namespace std;
 
 struct upload_status {
     const char *payload;
@@ -107,21 +113,73 @@ void emailvalidation(const std::string& email) {
     }
 }
 
-void key() {
-    std::string key;
-    std::string email;
-    std::cout << "Decrypt the following key ...., if you successfully find the key check your email for the next steps" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Enter the key: ";
-    std::cin >> key;
-    std::cout << std::endl;
-    //if (key == answerkey) {
-    std::cout << "You have found the key! Please enter a valid email for the next steps: ";
-    std::cin >> email;
-    std::cout << std::endl;
-    emailvalidation(email);
-    //}
+
+std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
+    std::vector<unsigned char> bytes;
+    for (size_t i = 0; i < hex.length(); i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        unsigned char byte = static_cast<unsigned char>(strtol(byteString.c_str(), nullptr, 16));
+        bytes.push_back(byte);
+    }
+    return bytes;
 }
+
+// AES decryption function
+std::string aes_ecb_decrypt(const std::vector<unsigned char>& ciphertext, const std::vector<unsigned char>& key) {
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    int len;
+    int plaintext_len;
+    std::vector<unsigned char> plaintext(ciphertext.size());
+
+    EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key.data(), NULL);
+    EVP_DecryptUpdate(ctx, plaintext.data(), &len, ciphertext.data(), ciphertext.size());
+    plaintext_len = len;
+
+    EVP_DecryptFinal_ex(ctx, plaintext.data() + len, &len);
+    plaintext_len += len;
+
+    plaintext.resize(plaintext_len);
+    EVP_CIPHER_CTX_free(ctx);
+    return std::string(plaintext.begin(), plaintext.end());
+}
+
+void key() {
+    //std::string key;
+    string email;
+    string encrypted_message_hex = "a79b39bd423dfef3e6b1e168ab5b0faf097af53a84ea65d7dd52e06106fa4ea6ecb573a880e4b2a9737efc56de57672f"; 
+
+    string given_key = "simplekey1234567";  
+
+    vector<unsigned char> keys(given_key.begin(), given_key.end());
+    vector<unsigned char> encrypted_message = hex_to_bytes(encrypted_message_hex);
+
+    cout << "Decrypt the following AES-128 ECB encrypted message.\n";
+    cout << "Encrypted Message (hex): " << encrypted_message_hex << "\n";
+    cout << "Encryption Key: " << given_key << "\n\n";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cout << "Enter the decrypted message: ";
+
+    string user_input;
+    cin >> user_input;
+
+    string decrypted_message = aes_ecb_decrypt(encrypted_message, keys);
+    cout << decrypted_message << "\n";
+    if (user_input == decrypted_message) {
+        string email;
+        cout << "Correct! You have decrypted the message!\n";
+        cout << "Please enter a valid email for the next steps: ";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        getline(std::cin, email);
+        emailvalidation(email);
+    } else {
+        std::cout << "Incorrect decryption. Please try again.\n";
+    }
+
+
+}
+
+
+
 
 bool isWSL() {
     const char* wsl = std::getenv("WSL_DISTRO_NAME");
