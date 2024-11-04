@@ -232,26 +232,28 @@ int main(){
     const int NUMBER_OF_QUESTIONS = 5;
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
 
-    // //checking if in WSL
-    if (isWSL()) {
-        std::remove("easy_math");
-        return 1;
-    }
+    // // //checking if in WSL
+    // if (isWSL()) {
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
-    //checking if in virtual environment (system command from stack overflow)
-    //linux specific (works for wsl too)
-    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
-        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
+    // //checking if in virtual environment (system command from stack overflow)
+    // //linux specific (works for wsl too)
+    // if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
+    //     std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
-    // checking if a debugger is present
-    if (isDebuggerPresent()) {
-        std::cout << "Debugger detected! Exiting..." << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
+    std::string math_facts = "596f75206861766520636f6d652061206c6f6e67207761792c20627574207468657265207374696c6c207365656d7320746f206265206d6f726520696e20796f7572207761792e20436f6e74696e7565206f6e20796f7572207761792c2061732074686520616e7377657220746f207468652072657374206f6620796f7572206a6f75726e6579206275696c64732075706f6e207768617420796f75206861766520616c726561647920646f6e652e204865726520697320796f75722072657761726420666f72206c6179657220313a20204d79737433";
+
+    // // checking if a debugger is present
+    // if (isDebuggerPresent()) {
+    //     std::cout << "Debugger detected! Exiting..." << std::endl;
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
     std::signal(SIGALRM, signal_handler);
 
@@ -286,7 +288,7 @@ int main(){
     std::cout << "Congratulations! You have passed the test!" << std::endl;
     std::cout << "You took " << elapsed_time << " seconds to complete the test." << std::endl;
     if(elapsed_time == 5) {
-        std::cout << "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey builds upon what you have already done. Here is your reward for layer 1:  Myst3" << std::endl;
+        std::cout << math_mode(math_facts) << std::endl;
     }
     key();
     return 0;
