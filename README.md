@@ -7,7 +7,8 @@
 
 dependencies for ComputeMe2:
 
-(update first): 
+(update first):
+```
 sudo apt-get update
 
 sudo apt-get install libssl-dev
@@ -15,3 +16,4 @@ sudo apt-get install libssl-dev
 sudo apt-get install libcurl4-openssl-dev
 
 sudo apt-get install build-essential
+```
