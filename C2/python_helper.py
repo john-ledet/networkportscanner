@@ -15,3 +15,8 @@ answers = ["d", "a", "c", "a", "a"]
 for answer in answers:
     hex_answer = ''.join(format(ord(c), '02x') for c in answer)
     print(hex_answer)
+
+message = "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey builds upon what you have already done. Here is your reward for layer 1:  Myst3"
+
+hex_message = ''.join(format(ord(c), '02x') for c in message)
+print(hex_message)

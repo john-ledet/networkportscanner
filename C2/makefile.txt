@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic
 
 # Linker flags (to link with libcurl)
-LDFLAGS = -lcurl -pthread
+LDFLAGS = -lcurl -pthread -lcrypto
 
 # Source files
 SRCS = easy_math.cpp
