@@ -12,6 +12,9 @@
 #include <cstdlib>
 #include <regex> 
 #include <curl/curl.h>
+#include <openssl/evp.h>
+
+using namespace std;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -217,6 +220,35 @@ bool ask_question(const std::string& question, const std::string& answer) {
     return correct;
 }
 
+std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
+    std::vector<unsigned char> bytes;
+    for (size_t i = 0; i < hex.length(); i += 2) {
+        std::string byteString = hex.substr(i, 2);
+        unsigned char byte = static_cast<unsigned char>(strtol(byteString.c_str(), nullptr, 16));
+        bytes.push_back(byte);
+    }
+    return bytes;
+}
+
+// AES decryption function
+std::string aes_ecb_decrypt(const std::vector<unsigned char>& ciphertext, const std::vector<unsigned char>& key) {
+    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+    int len;
+    int plaintext_len;
+    std::vector<unsigned char> plaintext(ciphertext.size());
+
+    EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key.data(), NULL);
+    EVP_DecryptUpdate(ctx, plaintext.data(), &len, ciphertext.data(), ciphertext.size());
+    plaintext_len = len;
+
+    EVP_DecryptFinal_ex(ctx, plaintext.data() + len, &len);
+    plaintext_len += len;
+
+    plaintext.resize(plaintext_len);
+    EVP_CIPHER_CTX_free(ctx);
+    return std::string(plaintext.begin(), plaintext.end());
+}
+
 int main(){
     const int NUMBER_OF_QUESTIONS = 5;
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
@@ -235,7 +267,7 @@ int main(){
         return 1;
     }
 
-    checking if a debugger is present
+    //checking if a debugger is present
     if (isDebuggerPresent()) {
         std::cout << "Debugger detected! Exiting..." << std::endl;
         std::remove("easy_math");
@@ -275,6 +307,20 @@ int main(){
     if(elapsed_time == 5) {
         std::cout << "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey builds upon what you have already done. Here is your reward for layer 1:  Myst3" << std::endl;
     }
+
+    
     key();
+    string cipher;
+    string found_key;
+    cout << "** Answer the following once you are certain **";
+    cout << "Enter the ciphertext that you have found within our program: (hint: copy and paste)\n";
+    cin >> cipher;
+    cout << "Ok, now enter the full 16 character key you found: \n";
+    cin >> found_key;
+
+    vector<unsigned char> keys(found_key.begin(), found_key.end());
+    vector<unsigned char> encrypted_message = hex_to_bytes(cipher);
+    string decrypted = aes_ecb_decrypt(encrypted_message, keys);
+    cout << "You'll know if this is right: " << decrypted;
     return 0;
 }
