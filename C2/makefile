@@ -17,18 +17,18 @@ EXEC = easy_math
 ifeq ($(OS),Windows_NT)
     # Windows-specific settings
     CXXFLAGS += -IC:/OpenSSL-Win64/include -IC:/curl/include
-    LDFLAGS = -LC:/OpenSSL-Win64/lib -LC:/curl/lib -lssl -lcrypto -lcurl
+    LDFLAGS = -LC:/OpenSSL-Win64/lib -LC:/curl/lib -lssl -lcrypto -lcurl -pthread
 else
     # Assume Linux/macOS
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Darwin)
         # macOS-specific settings (using Homebrew)
         CXXFLAGS += -I/opt/homebrew/opt/openssl@3/include -I/usr/local/opt/curl/include
-        LDFLAGS = -L/opt/homebrew/opt/openssl@3/lib -L/usr/local/opt/curl/lib -lcurl -lssl -lcrypto
+        LDFLAGS = -L/opt/homebrew/opt/openssl@3/lib -L/usr/local/opt/curl/lib -lcurl -lssl -lcrypto -pthread
     else
         # Linux-specific settings
         CXXFLAGS += -I/usr/include
-        LDFLAGS = -L/usr/lib -lcurl -lssl -lcrypto
+        LDFLAGS = -L/usr/lib -lcurl -lssl -lcrypto -pthread
     endif
 endif
 

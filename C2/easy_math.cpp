@@ -171,43 +171,27 @@ int main(){
 
     std::string math_facts = "596f75206861766520636f6d652061206c6f6e67207761792c20627574207468657265207374696c6c207365656d7320746f206265206d6f726520696e20796f7572207761792e20436f6e74696e7565206f6e20796f7572207761792c2061732074686520616e7377657220746f207468652072657374206f6620796f7572206a6f75726e6579206275696c64732075706f6e207768617420796f75206861766520616c726561647920646f6e652e204865726520697320796f75722072657761726420666f72206c6179657220313a20204d79737433";
 
-    std::vector<std::string> questions = {
-        "0a0a5768617420697320746865206c6f67283130302974682064657269766174697665206f662068287829203d2033785e37202d2036785e34202b2038785e33202d313278202b2031383f0a0a20286129203231785e36202d203234785e33202b3234785e32202d2031320a20286229203231785e36202d203132785e33202b20313278202d2031320a2028632920313236785e35202d203732785e32202d203438780a2028642920313236785e35202d203732785e32202b203438780a",
-        "0a0a576861742069732074686520353674682064657269766174697665206f662073696e2878293f0a0a202861292073696e2878290a2028622920636f732878290a20286329202d73696e2878290a20286429202d636f732878290a",
-        "0a0a576861742069732074686520696e74656772616c206f662031202f202873717274287829202a202878202b203129293f0a0a2028612920636f735e2d31287829202b20430a20286229203273696e5e2d3128312f7829202b20430a20286329203274616e5e2d31287371727428782929202b20430a2028642920322a2073717274287829202b2032202a206c6e2878202d203129202b20430a",
-        "0a0a576861742069732074686520696e74656772616c206f662031202f2028785e32202b2031293f0a0a202861292074616e5e2d31287829202b20430a202862292073696e5e2d31287829202b20430a2028632920636f735e2d31287829202b20430a20286429202d74616e5e2d31287829202b20430a",
-        "0a0a576861742069732074686520696e74656772616c206f662031202f20785e3228785e322b3235293f0a0a20286129202d312f323578202d20312f31323574616e5e2d3128782f3529202b20430a2028622920312f313278202d20312f31323574616e5e2d3128782f3329202b20430a2028632920312f313235636f735e2d3128782f3529202b20430a20286429202d312f333078202b20312f31323574616e5e2d3128782f3429202b20430a"
-    };
 
-    std::vector<std::string> answers = {
-        "64",
-        "61",
-        "63",
-        "61",
-        "61"
-    };
+    // //checking if in WSL
+    // if (isWSL()) {
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
+    // //checking if in virtual environment (system command from stack overflow)
+    // //linux specific (works for wsl too)
+    // if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
+    //     std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
-    //checking if in WSL
-    if (isWSL()) {
-        std::remove("easy_math");
-        return 1;
-    }
-
-    //checking if in virtual environment (system command from stack overflow)
-    //linux specific (works for wsl too)
-    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
-        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
-
-    //checking if a debugger is present
-    if (isDebuggerPresent()) {
-        std::cout << "Debugger detected! Exiting..." << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
+    // //checking if a debugger is present
+    // if (isDebuggerPresent()) {
+    //     std::cout << "Debugger detected! Exiting..." << std::endl;
+    //     std::remove("easy_math");
+    //     return 1;
+    // }
 
     std::signal(SIGALRM, signal_handler);
 
@@ -229,7 +213,9 @@ int main(){
 
     auto start_time = std::chrono::steady_clock::now();
     for(int i = 0; i < NUMBER_OF_QUESTIONS; i++) {
-        if(!ask_question(questions[i], answers[i])) {
+        std::string question = math_mode(questions[i]);
+        std::string answer = math_mode(answers[i]);
+        if(!ask_question(question, answer)) {
             std::remove("easy_math");
             return 1;
         }
