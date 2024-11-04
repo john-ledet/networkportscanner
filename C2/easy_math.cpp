@@ -163,7 +163,7 @@ void key() {
     cin >> user_input;
 
     string decrypted_message = aes_ecb_decrypt(encrypted_message, keys);
-    cout << decrypted_message << "\n";
+    
     if (user_input == decrypted_message) {
         string email;
         cout << "Correct! You have decrypted the message!\n";

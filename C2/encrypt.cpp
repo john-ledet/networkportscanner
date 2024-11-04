@@ -76,7 +76,7 @@ std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
 
 int main() {
     std::string plaintext = "aleksanderernestisthegoatofcs451";
-    std::string key = "simplekey12345678";  // 128-bit AES key for simplicity
+    std::string key = "Myst3ryH4v3n2024";  // 128-bit AES key for simplicity
 
     // Encrypt the message
     auto encrypted_message = aes_ecb_encrypt(plaintext, key);
