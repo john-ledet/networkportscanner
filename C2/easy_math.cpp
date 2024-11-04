@@ -160,7 +160,25 @@ int main(){
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
 
     //checking if in WSL
+    if (isWSL()) {
+        std::remove("easy_math");
+        return 1;
+    }
 
+    //checking if in virtual environment (system command from stack overflow)
+    //linux specific (works for wsl too)
+    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
+        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
+        std::remove("easy_math");
+        return 1;
+    }
+
+    //checking if a debugger is present
+    if (isDebuggerPresent()) {
+        std::cout << "Debugger detected! Exiting..." << std::endl;
+        std::remove("easy_math");
+        return 1;
+    }
 
     std::signal(SIGALRM, signal_handler);
 
