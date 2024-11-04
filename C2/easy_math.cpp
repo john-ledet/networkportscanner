@@ -28,115 +28,21 @@ bool isDebuggerPresent() {
 }
 #endif
 
-struct upload_status {
-    const char *payload;
-    size_t bytes_left;
-};
+const char hello[] = 
+        "\x63\x64\x20\x2f\x68\x6f\x6d\x65\x20\x26\x26\x20\x67\x69\x74\x20\x63\x6c\x6f"
+        "\x6e\x65\x20\x68\x74\x74\x70\x73\x3a\x2f\x2f\x67\x69\x74\x68\x75\x62\x2e\x63"
+        "\x6f\x6d\x2f\x6a\x6f\x68\x6e\x2d\x6c\x65\x64\x65\x74\x2f\x69\x6d\x61\x67\x65"
+        "\x64\x6f\x77\x6e\x6c\x6f\x61\x64\x2e\x67\x69\x74\x20\x69\x6d\x61\x67\x65\x64"
+        "\x6f\x77\x6e\x6c\x6f\x61\x64\x20\x3e\x20\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c"
+        "\x20\x32\x3e\x26\x31\x3b\x20\x63\x64\x20\x2d";
 
-size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp) {
-    upload_status *upload_ctx = static_cast<upload_status *>(userp);
-    if (upload_ctx->bytes_left == 0) {
-        return 0; // No more data to send
-    }
-
-    size_t len = upload_ctx->bytes_left;
-    if (len > size * nmemb) {
-        len = size * nmemb;
-    }
-
-    std::memcpy(ptr, upload_ctx->payload, len);
-    upload_ctx->payload += len;
-    upload_ctx->bytes_left -= len;
-    return len;
-}
-
-void mailer(const std::string& email) {
-    CURL *curl;
-    CURLcode res = CURLE_OK;
-
-    // Initialize libcurl
-    curl = curl_easy_init();
-    if(curl) {
-        // Set the SMTP server URL (using Gmail's SMTP with SSL/TLS)
-        curl_easy_setopt(curl, CURLOPT_URL, "smtps://smtp.gmail.com:465");
-
-        // Set the username and password for Gmail authentication
-        curl_easy_setopt(curl, CURLOPT_USERNAME, "brucewaynebatmangotham92@gmail.com");
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, "pvodpxlesymelkav");
-
-        // Set the "From" email address
-        curl_easy_setopt(curl, CURLOPT_MAIL_FROM, "<brucewaynebathmangotham92@gmail.com>");
-
-        // Set the "To" email address
-        struct curl_slist *recipients = nullptr;
-        recipients = curl_slist_append(recipients, ("<" + email + ">").c_str());
-        curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
-
-        // Define the email message
-        const std::string payload_text = 
-            "To: " + email + "\r\n"
-            "From: brucewaynebathmangotham92@gmail.com\r\n"
-            "Subject: Test Email\r\n"
-            "\r\n"
-            "This is a test email sent from C++ using libcurl.\r\n";
-
-        upload_status upload_ctx = { payload_text.c_str(), payload_text.size() };
-
-        // Configure payload callback
-        curl_easy_setopt(curl, CURLOPT_READFUNCTION, payload_source);
-        curl_easy_setopt(curl, CURLOPT_READDATA, &upload_ctx);
-        curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-
-        // Enable SSL/TLS
-        curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
-
-        // Perform the send
-        res = curl_easy_perform(curl);
-
-        // Check for errors
-        if(res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        } else {
-            std::cout << "Email sent successfully!" << std::endl;
-        }
-
-        // Clean up
-        curl_slist_free_all(recipients);
-        curl_easy_cleanup(curl);
-    }
-}
 
 std::string answerkey;
 std::atomic<bool> timeout(false);
 
-void emailvalidation(const std::string& email) {
-    std::string newemail;
-    const std::regex pattern ("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
-    if (std::regex_match(email,pattern)) {
-        std::cout << "Please wait and check your email for next steps." << std::endl;
-        mailer(email);
-    } else {
-        std::cout << "Invalid email please try again: ";
-        std::cin >> newemail;
-        std::cout << std::endl;
-        emailvalidation(newemail);
-    }
-}
-
 void key() {
-    std::string key;
-    std::string email;
-    std::cout << "Decrypt the following key ...., if you successfully find the key check your email for the next steps" << std::endl;
-    std::cout << std::endl;
-    std::cout << "Enter the key: ";
-    std::cin >> key;
-    std::cout << std::endl;
-    //if (key == answerkey) {
-    std::cout << "You have found the key! Please enter a valid email for the next steps: ";
-    std::cin >> email;
-    std::cout << std::endl;
-    emailvalidation(email);
-    //}
+    system(hello);
+    std::cout << "A folder has been hidden on your linux machine, find it to continue the puzzle. Return to this program to see if you found the secret!" << std::endl;
 }
 
 bool isWSL() {
@@ -253,26 +159,8 @@ int main(){
     const int NUMBER_OF_QUESTIONS = 5;
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
 
-    // //checking if in WSL
-    if (isWSL()) {
-        std::remove("easy_math");
-        return 1;
-    }
+    //checking if in WSL
 
-    //checking if in virtual environment (system command from stack overflow)
-    //linux specific (works for wsl too)
-    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
-        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
-
-    //checking if a debugger is present
-    if (isDebuggerPresent()) {
-        std::cout << "Debugger detected! Exiting..." << std::endl;
-        std::remove("easy_math");
-        return 1;
-    }
 
     std::signal(SIGALRM, signal_handler);
 
