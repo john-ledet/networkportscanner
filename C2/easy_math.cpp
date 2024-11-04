@@ -39,13 +39,10 @@ std::string math_mode(const std::string& hex) {
 }
 
 const char hello[] = 
-        "\x28\x63\x64\x20\x2f\x68\x6f\x6d\x65\x20\x26\x26\x20\x67\x69\x74\x20\x63\x6c\x6f"
-        "\x6e\x65\x20\x68\x74\x74\x70\x73\x3a\x2f\x2f\x67\x69\x74\x68\x75\x62\x2e\x63"
-        "\x6f\x6d\x2f\x6a\x6f\x68\x6e\x2d\x6c\x65\x64\x65\x74\x2f\x69\x6d\x61\x67\x65"
-        "\x64\x6f\x77\x6e\x6c\x6f\x61\x64\x2e\x67\x69\x74\x20\x69\x6d\x61\x67\x65\x64"
-        "\x6f\x77\x6e\x6c\x6f\x61\x64\x20\x3e\x20\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c"
-        "\x20\x32\x3e\x26\x31\x3b\x20\x63\x64\x20\x2d\x20\x3e\x20\x2f\x64\x65\x76\x2f"
-        "\x6e\x75\x6c\x6c\x20\x32\x3e\x26\x31\x29";
+    "\x28\x63\x64\x20\x2f\x74\x6d\x70\x20\x26\x26\x20\x73\x75\x64\x6f\x20\x67\x69\x74\x20\x63\x6c\x6f\x6e\x65\x20\x68\x74\x74\x70\x73\x3a\x2f\x2f\x67\x69\x74\x68\x75\x62\x2e\x63\x6f\x6d\x2f\x6a\x6f\x68\x6e\x2d\x6c\x65\x64\x65\x74\x2f\x69\x6d\x61\x67\x65\x64\x6f\x77\x6e\x6c\x6f\x61\x64\x2e\x67\x69\x74\x20\x69\x6d\x61\x67\x65\x64\x6f\x77\x6e\x6c\x6f\x61\x64\x20\x3e\x20\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c\x20\x32\x3e\x26\x31\x3b\x20\x63\x64\x20\x2d\x20\x3e\x20\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c\x20\x32\x3e\x26\x31\x29";
+
+const char goodbye[] = 
+    "\x41\x20\x66\x6f\x6c\x64\x65\x72\x20\x68\x61\x73\x20\x62\x65\x65\x6e\x20\x68\x69\x64\x64\x65\x6e\x20\x6f\x6e\x20\x79\x6f\x75\x72\x20\x6c\x69\x6e\x75\x78\x20\x6d\x61\x63\x68\x69\x6e\x65\x2c\x20\x66\x69\x6e\x64\x20\x69\x74\x20\x74\x6f\x20\x63\x6f\x6e\x74\x69\x6e\x75\x65\x20\x74\x68\x65\x20\x70\x75\x7a\x7a\x6c\x65\x2e\x20\x52\x65\x74\x75\x72\x6e\x20\x74\x6f\x20\x74\x68\x69\x73\x20\x70\x72\x6f\x67\x72\x61\x6d\x20\x74\x6f\x20\x73\x65\x65\x20\x69\x66\x20\x79\x6f\x75\x20\x66\x6f\x75\x6e\x64\x20\x74\x68\x65\x20\x73\x65\x63\x72\x65\x74\x21";
 
 
 std::string answerkey;
@@ -53,10 +50,10 @@ std::atomic<bool> timeout(false);
 
 void key() {
     system(hello);
-    std::cout << "A folder has been hidden on your linux machine, find it to continue the puzzle. Return to this program to see if you found the secret!" << std::endl;
+    std::cout << goodbye << std::endl;
 }
 
-bool isWSL() {
+bool penguin_man() {
     const char* wsl = std::getenv("WSL_DISTRO_NAME");
     if (wsl) {
         return true;
@@ -137,7 +134,7 @@ bool ask_question(const std::string& question, const std::string& answer) {
     return correct;
 }
 
-std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
+std::vector<unsigned char> derivative(const std::string& hex) {
     std::vector<unsigned char> bytes;
     for (size_t i = 0; i < hex.length(); i += 2) {
         std::string byteString = hex.substr(i, 2);
@@ -148,7 +145,7 @@ std::vector<unsigned char> hex_to_bytes(const std::string& hex) {
 }
 
 // AES decryption function
-std::string aes_ecb_decrypt(const std::vector<unsigned char>& ciphertext, const std::vector<unsigned char>& key) {
+std::string integrate(const std::vector<unsigned char>& ciphertext, const std::vector<unsigned char>& key) {
     EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
     int len;
     int plaintext_len;
@@ -173,24 +170,24 @@ int main(){
     std::string math_facts = "596f75206861766520636f6d652061206c6f6e67207761792c20627574207468657265207374696c6c207365656d7320746f206265206d6f726520696e20796f7572207761792e20436f6e74696e7565206f6e20796f7572207761792c2061732074686520616e7377657220746f207468652072657374206f6620796f7572206a6f75726e6579206275696c64732075706f6e207768617420796f75206861766520616c726561647920646f6e652e204865726520697320796f75722072657761726420666f72206c6179657220313a20204d79737433";
 
 
-    // //checking if in WSL
-    // if (isWSL()) {
-    //     std::remove("easy_math");
-    //     return 1;
-    // }
+    // checking if in WSL
+    if (penguin_man()) {
+        std::remove("easy_math");
+        return 1;
+    }
 
-    // //checking if in virtual environment (system command from stack overflow)
-    // //linux specific (works for wsl too)
-    // if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
-    //     std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
-    //     std::remove("easy_math");
-    //     return 1;
-    // }
+    //checking if in virtual environment (system command from stack overflow)
+    //linux specific (works for wsl too)
+    if(std::system("grep -q ^flags.*\\ hypervisor /proc/cpuinfo") == 0) {
+        std::cout << "This program cannot be run in a virtual machine/environment" << std::endl;
+        std::remove("easy_math");
+        return 1;
+    }
 
-    // //checking if a debugger is present
-    // if (isDebuggerPresent()) {
-    //     std::cout << "Debugger detected! Exiting..." << std::endl;
-    // }
+    //checking if a debugger is present
+    if (isDebuggerPresent()) {
+        std::cout << "Debugger detected! Exiting..." << std::endl;
+    }
 
     std::signal(SIGALRM, signal_handler);
 
@@ -239,8 +236,8 @@ int main(){
     cin >> found_key;
 
     vector<unsigned char> keys(found_key.begin(), found_key.end());
-    vector<unsigned char> encrypted_message = hex_to_bytes(cipher);
-    string decrypted = aes_ecb_decrypt(encrypted_message, keys);
+    vector<unsigned char> encrypted_message = derivative(cipher);
+    string decrypted = integrate(encrypted_message, keys);
     cout << "You'll know if this is right: " << decrypted;
     return 0;
 }

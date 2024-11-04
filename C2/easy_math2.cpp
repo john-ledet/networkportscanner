@@ -147,7 +147,7 @@ void key() {
     //}
 }
 
-bool isWSL() {
+bool penguin_man() {
     const char* wsl = std::getenv("WSL_DISTRO_NAME");
     if (wsl) {
         return true;
@@ -233,7 +233,7 @@ int main(){
     std::cout << "Make sure you have libcurl installed on your linux machine" << std::endl;
 
     // // //checking if in WSL
-    // if (isWSL()) {
+    // if (penguin_man()) {
     //     std::remove("easy_math");
     //     return 1;
     // }
