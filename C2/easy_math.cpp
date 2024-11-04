@@ -273,7 +273,7 @@ int main(){
     std::cout << "Congratulations! You have passed the test!" << std::endl;
     std::cout << "You took " << elapsed_time << " seconds to complete the test." << std::endl;
     if(elapsed_time == 5) {
-        std::cout << "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey lies in the work you have already done. Counterintuitively, you may find that the best way forward, is backwards...\n\nYou are 1/3rd of the way..." << std::endl;
+        std::cout << "You have come a long way, but there still seems to be more in your way. Continue on your way, as the answer to the rest of your journey builds upon what you have already done. Here is your reward for layer 1:  Myst3" << std::endl;
     }
     key();
     return 0;
